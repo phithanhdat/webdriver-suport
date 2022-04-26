@@ -1,0 +1,12 @@
+{
+  "student": {
+    "loginBtn": "types_student",
+    "uname": "user_code",
+    "upass": "password"
+  },
+  "teacher": {
+    "loginBtn": "types_teacher",
+    "uname": "email",
+    "upass": "password"
+  }
+}
