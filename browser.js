@@ -1,16 +1,36 @@
-require('chromedriver');
-const chrome = require('selenium-webdriver/chrome');
-const { Builder, By, Key, until } = require('selenium-webdriver');
+
+require('dotenv').config();
+// require('chromedriver');
+// const chrome = require('selenium-webdriver/chrome');
+const { Builder, By, Key, until, WebDriver } = require('selenium-webdriver');
 const stubFields = require('./stubFields.json');
 
+const installDriver = require('ms-chromium-edge-driver').installDriver;
+// const Builder = require('selenium-webdriver').Builder;
+const edge = require('selenium-webdriver/edge');
+const { goToCalendar, topCalendarGotoDate, goToLessonTop } = require('./navigateFunc');
+const { delay } = require('./Utils');
+
+async function name(){
+  const edgePaths = await installDriver();
+const edgeOptions = new edge.Options();
+console.log('edgeOptions:', edgeOptions)
+// edgeOptions.setEdgeChromium(true);
+edgeOptions.setBinaryPath(edgePaths.browserPath);
+const builder = await new Builder()
+  .forBrowser('MicrosoftEdge')
+  .setEdgeOptions(edgeOptions)
+  .setEdgeService(new edge.ServiceBuilder(edgePaths.driverPath))
+  //.build();
+
 const screen = {
-  width: 640,
-  height: 480
+  width: 750,
+  height: 520
 };
 
 
-const baseUrl = process.env.STG ? 'https://staging.edualpha.jp' : 'http://localhost:3000';
-const builder = new Builder().forBrowser('chrome');
+const baseUrl = process.env.DOT_ENV === 'stg' ? 'https://staging.edualpha.jp' : process.env.DOT_ENV === 'pro' ? 'https://edualpha.jp' : 'http://localhost:3000';
+//const builder = new Builder().forBrowser('chrome');
 const instances = [];
 
 async function doLogin(role, uname, upass) {
@@ -39,21 +59,67 @@ async function doLogin(role, uname, upass) {
     120 * 1000
   );
 
+  const page = false ? '/ja/home/lesson-top/393/' : null;
   console.log('[INFO]', `[${role}/${uname}]`, 'logged in');
-  if (process.env.BOARD) {
-    await browser.get(baseUrl + process.env.BOARD);
+  if (page) {
+    // await browser.get(baseUrl + '/ja/home/top-calendar/');
+    // await browser.get(baseUrl + '/ja/home/timetable/');
+    await browser.get(baseUrl + page);
   }
 
-  console.log('[INFO]', `[${role}/${uname}]`, 'visited');
+  console.log('[INFO]', `[${role}/${uname}]`, 'visited: ', (baseUrl + page));
+  return browser;
 }
 
-if (process.env.STG) {
-  doLogin('student', 'UC29DDB76', 'nrcCLA49');
-  doLogin('student', 'UC297LT77', 'gxsVKE37');
-  doLogin('teacher', 'van1@grr.la', 'xslKUV53');
-} else {
-  doLogin('teacher', '1801gv@gmail.com', 'masYGB39');
-  doLogin('student', 'UC328YYR2002', 'kuyR2S78');
+/**
+ * 
+ * @param {number} time 
+ * @param {WebDriver} browser 
+ */
+async function testLessonTop(time, browser) {
+  await goToCalendar(browser);
+  await topCalendarGotoDate('2022-05-09', browser);
+  for (let i = 0; i < time; i++) {
+    await goToLessonTop(browser)
+    const backBtn = await browser.findElement(By.className('teacher_lessontop_back_button'));
+    const imageEl = await browser.findElement(By.className('image-lessontop'));
+    console.log('[INFO]', `[test: ${i}] imageEl: `, typeof imageEl);
+    console.log('wait me');
+    await delay(100);
+    console.log('Im done ['+i+']');
+    await backBtn.click();
+    const lessonBtnEl = await browser.findElement(By.className('timetable__week__add-btn have-data'));
+    if (lessonBtnEl[0]) {
+      console.log('0: ', lessonBtnEl[0]);
+      await lessonBtnEl[0].click();
+    }
+  }
+  delay(60 * 60 * 1000);
+}
+
+
+if (process.env.DOT_ENV === 'pro') {
+  doLogin('teacher', '2504teacher03@gmail.com', 'Nagi1234');
+  doLogin('student', 'UC15TND102', 'vmtMLV78');
+} else
+if (process.env.DOT_ENV === 'stg') {
+//   doLogin('student', 'UC30V96141', 'Nagi1234');
+//   doLogin('student', 'UC30PV9140', 'Nagi1234');
+//   doLogin('student', 'UC30EGZ142', 'Nagi1234');
+//   doLogin('teacher', 'gvosakauni1@edu.jp', 'Nagi1234');
+   doLogin('student', 'UC29DDB76', 'nrcCLA49');
+   doLogin('student', 'UC297LT77', 'gxsVKE37');
+  doLogin('teacher', '1904gv01@gmail.com', 'edwPRQ46');
+} else { // dev Local
+ doLogin('teacher', '1801gv@gmail.com', 'masYGB39');
+ // testLessonTop(10, br);
+ const browser = await doLogin('student', 'UC3288DY9595', 'zftDNM57');
+ await goToCalendar(browser);
+  await topCalendarGotoDate('2022-05-16', browser);
+  await goToLessonTop(browser)
+  await delay(100);
+  console.log('Im done ');
+//  doLogin('teacher', 'datcoder@gmail.com', 'Dat12345');
 }
 
 process.stdin.resume();//so the program will not close instantly
@@ -80,4 +146,6 @@ process.on('SIGUSR2', exitHandler.bind(null, {exit:true}));
 
 //catches uncaught exceptions
 process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
+};
 
+name();
