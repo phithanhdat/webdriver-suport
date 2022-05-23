@@ -11,7 +11,7 @@ const edge = require('selenium-webdriver/edge');
 const { goToCalendar, topCalendarGotoDate, goToLessonTop } = require('./navigateFunc');
 const { delay } = require('./Utils');
 
-async function name(){
+async function main(){
   const edgePaths = await installDriver();
 const edgeOptions = new edge.Options();
 console.log('edgeOptions:', edgeOptions)
@@ -97,29 +97,29 @@ async function testLessonTop(time, browser) {
   delay(60 * 60 * 1000);
 }
 
+async function loginAndGotoLessonTop(role, uname, upass) {
+  const browser = await doLogin(role, uname, upass);
+  await goToCalendar(browser);
+  await topCalendarGotoDate('2022-05-16', browser);
+  await goToLessonTop(browser)
+  await delay(100);
+  console.log('Im done ');
+}
+
 
 if (process.env.DOT_ENV === 'pro') {
   doLogin('teacher', '2504teacher03@gmail.com', 'Nagi1234');
   doLogin('student', 'UC15TND102', 'vmtMLV78');
 } else
 if (process.env.DOT_ENV === 'stg') {
-//   doLogin('student', 'UC30V96141', 'Nagi1234');
-//   doLogin('student', 'UC30PV9140', 'Nagi1234');
-//   doLogin('student', 'UC30EGZ142', 'Nagi1234');
-//   doLogin('teacher', 'gvosakauni1@edu.jp', 'Nagi1234');
    doLogin('student', 'UC29DDB76', 'nrcCLA49');
    doLogin('student', 'UC297LT77', 'gxsVKE37');
   doLogin('teacher', '1904gv01@gmail.com', 'edwPRQ46');
 } else { // dev Local
- doLogin('teacher', '1801gv@gmail.com', 'masYGB39');
- // testLessonTop(10, br);
- const browser = await doLogin('student', 'UC3288DY9595', 'zftDNM57');
- await goToCalendar(browser);
-  await topCalendarGotoDate('2022-05-16', browser);
-  await goToLessonTop(browser)
-  await delay(100);
-  console.log('Im done ');
-//  doLogin('teacher', 'datcoder@gmail.com', 'Dat12345');
+//  doLogin('teacher', '1801gv@gmail.com', 'masYGB39');
+//  doLogin('student', 'UC3288DY9595', 'zftDNM57');
+loginAndGotoLessonTop('teacher', '1801gv@gmail.com', 'masYGB39')
+loginAndGotoLessonTop('student', 'UC3288DY9595', 'zftDNM57');
 }
 
 process.stdin.resume();//so the program will not close instantly
@@ -148,4 +148,4 @@ process.on('SIGUSR2', exitHandler.bind(null, {exit:true}));
 process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
 };
 
-name();
+main();
