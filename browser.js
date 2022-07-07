@@ -97,11 +97,18 @@ async function testLessonTop(time, browser) {
   delay(60 * 60 * 1000);
 }
 
-async function loginAndGotoLessonTop(role, uname, upass) {
+/**
+ * 
+ * @param {string} role 
+ * @param {string} uname 
+ * @param {string} upass 
+ * @param {number} lessonNum - to go to the lesson num(th) on timetable
+ */
+async function loginAndGotoLessonTop(role, uname, upass, lessonNum = 1) {
   const browser = await doLogin(role, uname, upass);
   await goToCalendar(browser);
-  await topCalendarGotoDate('2022-05-16', browser);
-  await goToLessonTop(browser)
+  await topCalendarGotoDate('2022-06-01', browser);
+  await goToLessonTop(browser, lessonNum)
   await delay(100);
   console.log('Im done ');
 }
@@ -112,14 +119,17 @@ if (process.env.DOT_ENV === 'pro') {
   doLogin('student', 'UC15TND102', 'vmtMLV78');
 } else
 if (process.env.DOT_ENV === 'stg') {
-   doLogin('student', 'UC29DDB76', 'nrcCLA49');
-   doLogin('student', 'UC297LT77', 'gxsVKE37');
-  doLogin('teacher', '1904gv01@gmail.com', 'edwPRQ46');
+  // doLogin('student', 'UC297LT77', 'gxsVKE37');
+  // doLogin('teacher', '1904gv01@gmail.com', 'edwPRQ46');
+  loginAndGotoLessonTop('student', 'UC30HHS170', 'Nagi1234',1);
+  loginAndGotoLessonTop('teacher', 'longcoder@gmail.com', 'Long1234',1);
 } else { // dev Local
 //  doLogin('teacher', '1801gv@gmail.com', 'masYGB39');
 //  doLogin('student', 'UC3288DY9595', 'zftDNM57');
-loginAndGotoLessonTop('teacher', '1801gv@gmail.com', 'masYGB39')
-loginAndGotoLessonTop('student', 'UC3288DY9595', 'zftDNM57');
+// loginAndGotoLessonTop('teacher', '1801gv@gmail.com', 'masYGB39', 1);
+// loginAndGotoLessonTop('student', 'UC3288DY9595', 'zftDNM57', 1);
+loginAndGotoLessonTop('teacher', '1801gv@gmail.com', 'masYGB39', 1);
+// loginAndGotoLessonTop('student', 'UC435CLX10289', 'suyMTZ79', 1);
 }
 
 process.stdin.resume();//so the program will not close instantly

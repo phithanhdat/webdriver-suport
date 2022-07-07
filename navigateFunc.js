@@ -26,10 +26,10 @@ async function goToCalendar(browser) {
  * @param {WebDriver} browser 
  * @param {number} num 
  */
-async function goToLessonTop(browser, num = 0) {
-  const lesonBtnEl = await browser.findElements(By.xpath(`//button[contains(@class, 'have-data')]`));
-  console.log('[INFO]: lessonBtnEl:', lesonBtnEl);
-  await lesonBtnEl[num].click();
+async function goToLessonTop(browser, num = 1) {
+  const lesonBtnEl = await browser.findElements(By.xpath(`(//button[contains(@class, 'have-data')])[${num}]`));
+  console.log('[INFO]: lessonBtnEl:', lesonBtnEl.length);
+  await lesonBtnEl[0].click();
   console.log('[INFO]: top lesson-top OK');
 }
 
